@@ -1,5 +1,7 @@
+
 /**
- * Pão de Mestre — Carrossel Infinito Automático (1,5s) & Interatividade
+ * Pão de Mestre — Carrossel Infinito Automático
+ * Navegação manual, indicadores, swipe e rotação automática.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,310 +19,465 @@ function initRestaurantCarousel() {
 
   if (!carousel || !viewport || !track) return;
 
-  const originalSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+  const originalSlides = Array.from(
+    track.querySelectorAll('.carousel-slide')
+  );
+
   const totalOriginal = originalSlides.length;
+
   if (totalOriginal === 0) return;
 
   // Configurações
-  const DURATION_MS = 1500; // 1,5 segundos por slide (conforme solicitado)
-  const TRANSITION_DURATION = 420; // ms da transição suave
-  let isPlaying = true;
-  let isTransitioning = false;
-  let timerId = null;
-  let animationStart = null;
-  let progressAnimFrame = null;
-  let pausedProgressTime = 0;
-  let isHovered = false;
+  const DURATION_MS = 4000;
+  const TRANSITION_DURATION = 420;
 
-  // Clona os slides para garantir loop infinito fluido e ininterrupto
-  // Duplicamos os slides antes e depois
+  const prefersReducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  );
+
+  let isPlaying = !prefersReducedMotion.matches;
+  let isTransitioning = false;
+  let isHovered = false;
+  let isTouching = false;
+
+  let transitionSafetyTimeout = null;
+  let autoTimerId = null;
+  let timerStartedAt = null;
+  let remainingTime = DURATION_MS;
+  let resizeFrame = null;
+
+  // Verifica se a rotação automática pode acontecer.
+  function canPlay() {
+    return (
+      isPlaying &&
+      !isHovered &&
+      !isTouching &&
+      !document.hidden &&
+      !prefersReducedMotion.matches
+    );
+  }
+
+  // Cria os clones anteriores.
   const clonesBefore = originalSlides.map(slide => {
     const clone = slide.cloneNode(true);
+
     clone.classList.add('is-clone');
     clone.setAttribute('aria-hidden', 'true');
+    clone.inert = true;
+
     return clone;
   });
 
+  // Cria os clones posteriores.
   const clonesAfter = originalSlides.map(slide => {
     const clone = slide.cloneNode(true);
+
     clone.classList.add('is-clone');
     clone.setAttribute('aria-hidden', 'true');
+    clone.inert = true;
+
     return clone;
   });
 
-  clonesBefore.reverse().forEach(clone => track.insertBefore(clone, track.firstChild));
-  clonesAfter.forEach(clone => track.appendChild(clone));
+  clonesBefore.reverse().forEach(clone => {
+    track.insertBefore(clone, track.firstChild);
+  });
 
-  // Todos os slides atuais no DOM (totalOriginal * 3)
-  let allSlides = Array.from(track.querySelectorAll('.carousel-slide'));
-  // O índice real inicial aponta para o primeiro slide original
-  let currentIndex = totalOriginal; // índice dentro de allSlides
+  clonesAfter.forEach(clone => {
+    track.appendChild(clone);
+  });
 
-  // Gera os indicadores (dots) se não existirem ou atualiza os existentes
-  let dots = Array.from(dotsContainer ? dotsContainer.querySelectorAll('.carousel-dot') : []);
+  // Todos os slides, incluindo os clones.
+  const allSlides = Array.from(
+    track.querySelectorAll('.carousel-slide')
+  );
+
+  // Começa no primeiro slide original.
+  let currentIndex = totalOriginal;
+
+  // Criação dos indicadores, caso ainda não existam.
+  let dots = Array.from(
+    dotsContainer
+      ? dotsContainer.querySelectorAll('.carousel-dot')
+      : []
+  );
+
   if (dots.length === 0 && dotsContainer) {
-    dotsContainer.innerHTML = '';
     for (let i = 0; i < totalOriginal; i++) {
       const dot = document.createElement('button');
+
       dot.type = 'button';
       dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
       dot.setAttribute('role', 'tab');
       dot.setAttribute('aria-label', `Ir para a foto ${i + 1}`);
       dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
       dot.dataset.index = i;
+
       dotsContainer.appendChild(dot);
       dots.push(dot);
     }
   }
 
-  // Calcula a largura de 1 slide + espaçamento
+  // Calcula a distância entre o início de dois slides.
   function getSlideStep() {
     if (allSlides.length === 0) return 0;
-    const firstRect = allSlides[0].getBoundingClientRect();
-    const style = window.getComputedStyle(allSlides[0]);
+
+    const firstSlide = allSlides[0];
+    const rect = firstSlide.getBoundingClientRect();
+    const style = window.getComputedStyle(firstSlide);
+
     const marginRight = parseFloat(style.marginRight) || 0;
-    return firstRect.width + marginRight;
+
+    return rect.width + marginRight;
   }
 
-  // Posiciona o track sem animação
+  // Atualiza a posição horizontal do carrossel.
   function updatePosition(smooth = true) {
     const step = getSlideStep();
-    if (smooth) {
-      track.style.transition = `transform ${TRANSITION_DURATION}ms cubic-bezier(0.25, 1, 0.5, 1)`;
+
+    const duration = prefersReducedMotion.matches
+      ? 0
+      : TRANSITION_DURATION;
+
+    if (smooth && duration > 0) {
+      track.style.transition =
+        `transform ${duration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
     } else {
       track.style.transition = 'none';
     }
+
     const offset = currentIndex * step;
+
     track.style.transform = `translate3d(-${offset}px, 0, 0)`;
   }
 
-  // Atualiza indicadores (dots)
+  // Atualiza os indicadores e o slide ativo.
   function updateUI() {
-    const activeIndex = ((currentIndex % totalOriginal) + totalOriginal) % totalOriginal;
+    const activeIndex =
+      ((currentIndex % totalOriginal) + totalOriginal) %
+      totalOriginal;
 
-    dots.forEach((dot, idx) => {
-      const isActive = idx === activeIndex;
+    dots.forEach((dot, index) => {
+      const isActive = index === activeIndex;
+
       dot.classList.toggle('active', isActive);
-      dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      dot.setAttribute('aria-selected', String(isActive));
     });
 
-    // Classe ativa nos cards
-    allSlides.forEach((slide, idx) => {
-      slide.classList.toggle('is-active', idx === currentIndex);
+    allSlides.forEach((slide, index) => {
+      slide.classList.toggle(
+        'is-active',
+        index === currentIndex
+      );
     });
   }
 
-  let transitionSafetyTimeout = null;
+  // Finaliza a transição e corrige a posição ao chegar nos clones.
+  function finishTransition() {
+    if (!isTransitioning) return;
 
-  // Reposiciona sem transição caso caia na área dos clones
-  function handleTransitionEnd() {
     clearTimeout(transitionSafetyTimeout);
+    transitionSafetyTimeout = null;
+
     isTransitioning = false;
-    
+
     if (currentIndex >= totalOriginal * 2) {
-      // Passou do último original para os clones depois
       currentIndex -= totalOriginal;
-      updatePosition(false);
     } else if (currentIndex < totalOriginal) {
-      // Foi para trás dos originais nos clones antes
       currentIndex += totalOriginal;
-      updatePosition(false);
     }
+
+    // Reposiciona sem animação após a correção dos clones.
+    updatePosition(false);
     updateUI();
   }
 
-  track.addEventListener('transitionend', handleTransitionEnd);
+  // Só considera o fim da animação do próprio track.
+  track.addEventListener('transitionend', event => {
+    if (event.target !== track) return;
+    if (event.propertyName !== 'transform') return;
 
+    finishTransition();
+  });
+
+  // Controla o tempo máximo de uma transição.
   function scheduleTransitionSafety() {
     clearTimeout(transitionSafetyTimeout);
+
     transitionSafetyTimeout = setTimeout(() => {
-      if (isTransitioning) {
-        handleTransitionEnd();
-      }
+      finishTransition();
     }, TRANSITION_DURATION + 120);
   }
 
-  // Avança para o próximo slide
+  // Inicia uma movimentação.
+  function moveToIndex(nextIndex, resetTimer = true) {
+    if (isTransitioning) return false;
+
+    isTransitioning = true;
+    currentIndex = nextIndex;
+
+    updatePosition(true);
+    updateUI();
+
+    const duration = prefersReducedMotion.matches
+      ? 0
+      : TRANSITION_DURATION;
+
+    if (duration === 0) {
+      finishTransition();
+    } else {
+      scheduleTransitionSafety();
+    }
+
+    if (resetTimer) {
+      resetAutoTimer();
+    }
+
+    return true;
+  }
+
+  // Avança um slide.
   function nextSlide() {
-    if (isTransitioning) return;
-    isTransitioning = true;
-    currentIndex++;
-    updatePosition(true);
-    scheduleTransitionSafety();
-    updateUI();
-    resetProgress();
+    return moveToIndex(currentIndex + 1);
   }
 
-  // Volta para o slide anterior
+  // Volta um slide.
   function prevSlide() {
-    if (isTransitioning) return;
-    isTransitioning = true;
-    currentIndex--;
-    updatePosition(true);
-    scheduleTransitionSafety();
-    updateUI();
-    resetProgress();
+    return moveToIndex(currentIndex - 1);
   }
 
-  // Vai para um slide específico
+  // Vai até um indicador específico.
   function goToSlide(targetIndex) {
-    if (isTransitioning) return;
-    isTransitioning = true;
-    const currentActive = ((currentIndex % totalOriginal) + totalOriginal) % totalOriginal;
-    const diff = targetIndex - currentActive;
-    currentIndex += diff;
-    updatePosition(true);
-    scheduleTransitionSafety();
-    updateUI();
-    resetProgress();
-  }
-
-  // Rotação automática (1,5 segundos)
-  function animateProgress(timestamp) {
-    if (!isPlaying || isHovered) return;
-
-    if (!animationStart) animationStart = timestamp - pausedProgressTime;
-    const elapsed = timestamp - animationStart;
-
-    if (elapsed >= DURATION_MS) {
-      nextSlide();
-      animationStart = timestamp;
-      pausedProgressTime = 0;
+    if (
+      !Number.isInteger(targetIndex) ||
+      targetIndex < 0 ||
+      targetIndex >= totalOriginal
+    ) {
+      return;
     }
 
-    progressAnimFrame = requestAnimationFrame(animateProgress);
-  }
+    const currentActive =
+      ((currentIndex % totalOriginal) + totalOriginal) %
+      totalOriginal;
 
-  function startTimer() {
-    if (progressAnimFrame) cancelAnimationFrame(progressAnimFrame);
-    animationStart = performance.now() - pausedProgressTime;
-    progressAnimFrame = requestAnimationFrame(animateProgress);
-  }
+    let diff = targetIndex - currentActive;
 
-  function pauseTimer() {
-    if (progressAnimFrame) {
-      cancelAnimationFrame(progressAnimFrame);
-      progressAnimFrame = null;
+    // Escolhe o caminho mais curto no carrossel infinito.
+    if (diff > totalOriginal / 2) {
+      diff -= totalOriginal;
+    } else if (diff < -totalOriginal / 2) {
+      diff += totalOriginal;
     }
-    if (animationStart) {
-      pausedProgressTime = performance.now() - animationStart;
-    }
+
+    moveToIndex(currentIndex + diff);
   }
 
-  function resetProgress() {
-    pausedProgressTime = 0;
-    animationStart = performance.now();
-    if (isPlaying && !isHovered) {
-      startTimer();
+  // Limpa o temporizador automático.
+  function clearAutoTimer() {
+    if (autoTimerId !== null) {
+      clearTimeout(autoTimerId);
+      autoTimerId = null;
     }
+
+    timerStartedAt = null;
   }
 
-  // Controles de clique
+  // Agenda o próximo avanço automático.
+  function startAutoTimer() {
+    if (!canPlay() || autoTimerId !== null) return;
+
+    timerStartedAt = performance.now();
+
+    autoTimerId = setTimeout(() => {
+      autoTimerId = null;
+      timerStartedAt = null;
+      remainingTime = DURATION_MS;
+
+      if (!canPlay()) return;
+
+      const moved = moveToIndex(currentIndex + 1, false);
+
+      if (moved) {
+        startAutoTimer();
+      } else {
+        startAutoTimer();
+      }
+    }, remainingTime);
+  }
+
+  // Pausa o temporizador preservando o tempo restante.
+  function pauseAutoTimer() {
+    if (autoTimerId === null) return;
+
+    clearTimeout(autoTimerId);
+
+    const elapsed = performance.now() - timerStartedAt;
+
+    remainingTime = Math.max(0, remainingTime - elapsed);
+
+    autoTimerId = null;
+    timerStartedAt = null;
+  }
+
+  // Reinicia a contagem depois de uma interação manual.
+  function resetAutoTimer() {
+    clearAutoTimer();
+
+    remainingTime = DURATION_MS;
+
+    startAutoTimer();
+  }
+
+  // Controles de navegação.
   if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      nextSlide();
-    });
+    nextBtn.addEventListener('click', nextSlide);
   }
 
   if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      prevSlide();
-    });
+    prevBtn.addEventListener('click', prevSlide);
   }
 
   dots.forEach(dot => {
     dot.addEventListener('click', () => {
-      const idx = parseInt(dot.dataset.index, 10);
-      goToSlide(idx);
+      const index = Number.parseInt(dot.dataset.index, 10);
+
+      goToSlide(index);
     });
   });
 
-  // Pausa no Hover para melhor experiência de visualização das fotos
+  // Pausa quando o mouse entra no carrossel.
   carousel.addEventListener('mouseenter', () => {
     isHovered = true;
-    pauseTimer();
+    pauseAutoTimer();
   });
 
+  // Retoma quando o mouse sai do carrossel.
   carousel.addEventListener('mouseleave', () => {
     isHovered = false;
-    if (isPlaying) {
-      startTimer();
-    }
+    startAutoTimer();
   });
 
-  // Pausa quando a aba fica em segundo plano
+  // Pausa quando a aba fica em segundo plano.
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      pauseTimer();
-    } else if (isPlaying && !isHovered) {
-      startTimer();
+      pauseAutoTimer();
+    } else {
+      startAutoTimer();
     }
   });
 
-  // Navegação por teclado quando o carrossel estiver focado
-  carousel.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') {
+  // Respeita mudanças na preferência de movimento do usuário.
+  prefersReducedMotion.addEventListener('change', event => {
+    if (event.matches) {
+      isPlaying = false;
+      pauseAutoTimer();
+      updatePosition(false);
+    } else {
+      isPlaying = true;
+      startAutoTimer();
+    }
+  });
+
+  // Navegação por teclado.
+  carousel.addEventListener('keydown', event => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
       prevSlide();
-    } else if (e.key === 'ArrowRight') {
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
       nextSlide();
     }
   });
 
-  // Suporte a Touch Gestures (Swipe em dispositivos móveis)
+  // Suporte a gestos de deslizar (swipe).
   let touchStartX = 0;
-  let touchEndX = 0;
 
-  viewport.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    isHovered = true;
-    pauseTimer();
+  viewport.addEventListener('touchstart', event => {
+    if (!event.changedTouches.length) return;
+
+    touchStartX = event.changedTouches[0].clientX;
+
+    isTouching = true;
+    pauseAutoTimer();
   }, { passive: true });
 
-  viewport.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    isHovered = false;
+  viewport.addEventListener('touchend', event => {
+    if (!event.changedTouches.length) return;
+
+    const touchEndX = event.changedTouches[0].clientX;
     const diff = touchStartX - touchEndX;
+
+    isTouching = false;
+
     if (Math.abs(diff) > 40) {
       if (diff > 0) {
         nextSlide();
       } else {
         prevSlide();
       }
-    }
-    if (isPlaying) {
-      startTimer();
+    } else {
+      startAutoTimer();
     }
   }, { passive: true });
 
-  // Recalcular posições no redimensionamento da janela e no carregamento completo
+  // Também retoma o temporizador se o gesto for cancelado.
+  viewport.addEventListener('touchcancel', () => {
+    isTouching = false;
+    startAutoTimer();
+  }, { passive: true });
+
+  // Recalcula a posição após o redimensionamento.
   window.addEventListener('resize', () => {
-    updatePosition(false);
+    if (resizeFrame !== null) {
+      cancelAnimationFrame(resizeFrame);
+    }
+
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = null;
+
+      // Não interrompe uma transição em andamento.
+      if (!isTransitioning) {
+        updatePosition(false);
+      }
+    });
   });
 
+  // Ajusta a posição depois do carregamento completo.
   window.addEventListener('load', () => {
-    updatePosition(false);
-    updateUI();
+    if (!isTransitioning) {
+      updatePosition(false);
+      updateUI();
+    }
   });
 
-  // Inicialização inicial
+  // Inicialização.
   updatePosition(false);
   updateUI();
-  resetProgress();
+  startAutoTimer();
 }
 
+// Rolagem suave entre as seções da página.
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      const targetId = this.getAttribute('href');
-      if (targetId === '#' || targetId === '') return;
-      const target = document.querySelector(targetId);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
+    anchor.addEventListener('click', event => {
+      const targetId = anchor.getAttribute('href');
+
+      if (!targetId || targetId === '#') return;
+
+      const target = document.getElementById(
+        targetId.slice(1)
+      );
+
+      if (!target) return;
+
+      event.preventDefault();
+
+      target.scrollIntoView({
+        behavior: window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches ? 'auto' : 'smooth',
+        block: 'start'
+      });
     });
   });
 }
