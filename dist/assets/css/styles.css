@@ -1446,3 +1446,11 @@ footer p,footer>a:last-child {
 @media (prefers-reduced-motion: reduce) {
   .primary-nav > a:not(.nav-contact)::after { transition: none; }
 }
+
+/* Aproxima catálogo e avaliações sem remover o respiro das seções. */
+#sabores.section { padding-bottom: 40px; }
+#galeria.section { padding-top: 40px; }
+@media (max-width: 640px) {
+  #sabores.section { padding-bottom: 28px; }
+  #galeria.section { padding-top: 28px; }
+}
