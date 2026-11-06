@@ -1,4 +1,4 @@
-# GEMINI.md
+# CODEX.md
 
 ## Contexto do projeto
 Projeto de extensão universitária da disciplina PEC IV, denominado **Impulso Web: Criação de Landing Pages para Visibilidade Digital de Negócios**.
