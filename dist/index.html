@@ -15,15 +15,20 @@
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
   <div class="topline">DO PRIMEIRO CAFÉ ÀQUELA PAUSA NO DIA.</div>
   
-  <header class="header wrap">
+  <header class="header">
     <a class="brand" href="#inicio" aria-label="Pão de Mestre, início">
       <img src="assets/img/logo.webp" alt="Pão de Mestre — Padaria e Conveniência" width="82" height="82">
     </a>
-    <nav aria-label="Navegação principal">
-      <a href="#sabores">Nossos sabores</a>
-      <a href="#galeria">Nosso espaço</a>
-      <a href="#sobre">A padaria</a>
-      <a class="nav-contact" href="#contato">Fale com a gente <svg class="icon-svg icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menu">
+      <svg class="menu-icon-open" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      <svg class="menu-icon-close" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <nav class="primary-nav" id="primary-navigation" aria-label="Navegação principal">
+      <a href="#inicio">Início</a>
+      <a href="#sabores">Catálogo</a>
+      <a href="#galeria">Avaliações</a>
+      <a href="#sobre">Sobre nós</a>
+      <a class="nav-contact" href="#contato">Contato <svg class="icon-svg icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
     </nav>
   </header>
 

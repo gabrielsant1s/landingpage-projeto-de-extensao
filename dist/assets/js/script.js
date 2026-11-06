@@ -1,9 +1,36 @@
 /** Pão de Mestre — carrossel infinito de avaliações e rolagem suave. */
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileNavigation();
   initReviewsCarousel();
   initSmoothScroll();
 });
 
+function initMobileNavigation() {
+  const button = document.getElementById('menu-toggle');
+  const navigation = document.getElementById('primary-navigation');
+  if (!button || !navigation) return;
+
+  function closeMenu() {
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-label', 'Abrir menu');
+    navigation.classList.remove('is-open');
+  }
+
+  button.addEventListener('click', () => {
+    const isOpen = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', String(!isOpen));
+    button.setAttribute('aria-label', isOpen ? 'Abrir menu' : 'Fechar menu');
+    navigation.classList.toggle('is-open', !isOpen);
+  });
+  navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { closeMenu(); button.focus(); }
+  });
+  document.addEventListener('click', event => {
+    if (!navigation.contains(event.target) && !button.contains(event.target)) closeMenu();
+  });
+  window.addEventListener('resize', () => { if (window.innerWidth > 640) closeMenu(); });
+}
 function initReviewsCarousel() {
   const carousel = document.getElementById('reviews-carousel');
   const viewport = document.getElementById('reviews-viewport');
