@@ -170,146 +170,46 @@
       </div>
       <p class="availability">Nomes, composição, tamanhos, preços e disponibilidade devem ser confirmados com a padaria.</p>
     </section>
-    <!-- CARROSSEL AUTOMÁTICO INFINITO (1,5s) COM AS IMAGENS DO RESTAURANTE -->
-    <section class="gallery wrap section" id="galeria" aria-label="Galeria de fotos do restaurante e padaria">
+    <!-- AVALIAÇÕES -->
+    <section class="reviews wrap section" id="galeria" aria-labelledby="reviews-title">
       <div class="section-heading">
         <div>
-          <p class="eyebrow"><span></span> NOSSO ESPAÇO & SABORES</p>
-          <h2>Conheça de perto a<br><em>Pão de Mestre.</em></h2>
+          <p class="eyebrow">QUEM JÁ PASSOU POR AQUI</p>
+          <h2 id="reviews-title">O que dizem<br><em>nossos clientes.</em></h2>
         </div>
-        <div class="carousel-heading-meta">
-          <p>Um giro completo pelas nossas vitrines, receitas especiais e salão aconchegante.</p>
-        </div>
+        <div class="reviews-summary"><span class="summary-stars" aria-hidden="true">★★★★★</span><strong>4 avaliações</strong><span>Todos os comentários são 5 estrelas</span></div>
       </div>
 
-      <div class="carousel-container" id="restaurant-carousel" role="region" aria-roledescription="carrossel" aria-label="Fotos do restaurante Pão de Mestre">
-        <div class="carousel-stage">
-        <!-- Seta minimalista: anterior -->
-        <button class="carousel-arrow prev" id="carousel-prev" aria-label="Foto anterior" type="button">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-
-        <!-- Viewport do Carrossel Infinito -->
-        <div class="carousel-viewport" id="carousel-viewport">
-          <div class="carousel-track" id="carousel-track">
-            <!-- Slide 1: Pães Artesanais -->
-            <div class="carousel-slide" data-index="0">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8709.JPG.webp" alt="Vitrine de pães artesanais fresquinhos e salgados da Pão de Mestre" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">PADARIA</span>
-                  <h3>Vitrine de pães</h3>
-                  <p>Vitrine com variedade de pães e itens de padaria.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 2: Bolos Especiais -->
-            <div class="carousel-slide" data-index="1">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8706.JPG.webp" alt="Bolo especial com morangos frescos e cookies recheados" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">CONFEITARIA</span>
-                  <h3>Bolo decorado com morangos</h3>
-                  <p>Bolo decorado com morangos, biscoitos e cobertura de chocolate.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 3: Frios, Queijos e Rotisseria -->
-            <div class="carousel-slide" data-index="2">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8708.JPG.webp" alt="Balcão vitrine climatizado com frios, queijos, doces e sobremesas" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">VITRINE</span>
-                  <h3>Produtos no balcão refrigerado</h3>
-                  <p>Balcão refrigerado com produtos embalados e itens expostos.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 4: Bolo Trufado -->
-            <div class="carousel-slide" data-index="3">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8704.JPG.webp" alt="Bolo de chocolate artesanal com raspas de chocolate branco" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">SOBREMESA DO DIA</span>
-                  <h3>Bolo com raspas e cobertura</h3>
-                  <p>Cobertura escura com raspas claras e fios de chocolate na superfície.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 5: Salão do Restaurante / Padaria -->
-            <div class="carousel-slide" data-index="4">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8702.JPG.webp" alt="Visão geral do salão, gôndolas e balcões da Pão de Mestre" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">NOSSO AMBIENTE</span>
-                  <h3>Interior da padaria</h3>
-                  <p>Vista do interior com balcões, gôndolas e área de circulação.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 6: Bolo Festivo -->
-            <div class="carousel-slide" data-index="5">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8705.JPG.webp" alt="Torta festiva confeitada com morango e calda especial" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">MOMENTOS ESPECIAIS</span>
-                  <h3>Bolo com cobertura e decoração</h3>
-                  <p>Bolo com laterais claras, cobertura escura e decoração de chocolate e morango.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 7: Conveniência e Mercearia -->
-            <div class="carousel-slide" data-index="6">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8703.JPG.webp" alt="Gôndolas de conveniência, cafés e embutidos de qualidade" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">CONVENIÊNCIA & ROTINA</span>
-                  <h3>Interior da padaria e conveniência</h3>
-                  <p>Vista do espaço com gôndolas, balcões e área de circulação.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 8: Bolo com cobertura de chocolate -->
-            <div class="carousel-slide" data-index="7">
-              <div class="slide-card">
-                <img src="assets/img/IMG_8707.JPG.webp" alt="Bolo brigadeiro artesanal com raspas de chocolate" loading="lazy">
-                <div class="slide-overlay">
-                  <span class="slide-badge">RECEITA DE MESTRE</span>
-                  <h3>Bolo com cobertura de chocolate</h3>
-                  <p>Bolo redondo com cobertura escura e raspas de chocolate na decoração.</p>
-                </div>
-              </div>
-            </div>
+      <div class="reviews-carousel" id="reviews-carousel" role="region" aria-roledescription="carrossel" aria-label="Avaliações de clientes">
+        <button class="reviews-arrow reviews-prev" id="reviews-prev" type="button" aria-label="Avaliação anterior">‹</button>
+        <div class="reviews-viewport" id="reviews-viewport">
+          <div class="reviews-track" id="reviews-track" aria-live="off">
+            <article class="review-card">
+              <div class="review-stars" role="img" aria-label="5 de 5 estrelas">★★★★★</div>
+              <div class="review-author"><span class="review-avatar" aria-hidden="true">JC</span><h3>J Carlos</h3></div>
+              <p>“Lugar bonito, bons preços e com comidas feitas no dia.”</p>
+            </article>
+            <article class="review-card">
+              <div class="review-stars" role="img" aria-label="5 de 5 estrelas">★★★★★</div>
+              <div class="review-author"><span class="review-avatar" aria-hidden="true">ML</span><h3>Matheus Longo</h3></div>
+              <p>“Pães quentinhos a toda hora”</p>
+            </article>
+            <article class="review-card">
+              <div class="review-stars" role="img" aria-label="5 de 5 estrelas">★★★★★</div>
+              <div class="review-author"><span class="review-avatar" aria-hidden="true">DA</span><h3>Denise Alves</h3></div>
+              <p>“Atendimento top”</p>
+            </article>
+            <article class="review-card">
+              <div class="review-stars" role="img" aria-label="5 de 5 estrelas">★★★★★</div>
+              <div class="review-author"><span class="review-avatar" aria-hidden="true">GR</span><h3>Gian Rodrigues</h3></div>
+              <p>“Excelente!”</p>
+            </article>
           </div>
         </div>
-
-        <!-- Seta minimalista: próxima -->
-        <button class="carousel-arrow next" id="carousel-next" aria-label="Próxima foto" type="button">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </button>
-        </div>
-
-        <!-- Indicadores de navegação (Dots) -->
-        <div class="carousel-dots" id="carousel-dots" role="tablist" aria-label="Fotos do carrossel">
-          <button class="carousel-dot active" role="tab" aria-selected="true" aria-label="Ir para a foto 1" data-index="0" type="button"></button>
-          <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Ir para a foto 2" data-index="1" type="button"></button>
-          <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Ir para a foto 3" data-index="2" type="button"></button>
-          <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Ir para a foto 4" data-index="3" type="button"></button>
-          <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Ir para a foto 5" data-index="4" type="button"></button>
-          <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Ir para a foto 6" data-index="5" type="button"></button>
-          <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Ir para a foto 7" data-index="6" type="button"></button>
-          <button class="carousel-dot" role="tab" aria-selected="false" aria-label="Ir para a foto 8" data-index="7" type="button"></button>
-        </div>
+        <button class="reviews-arrow reviews-next" id="reviews-next" type="button" aria-label="Próxima avaliação">›</button>
       </div>
+      <div class="reviews-pagination" id="reviews-pagination" aria-label="Escolher avaliação"></div>
     </section>
-
     <!-- SOBRE A PADARIA COM FOTO DO ESPAÇO -->
     <section class="about" id="sobre">
       <div class="wrap about-inner">
@@ -375,5 +275,3 @@
   </footer>
 </body>
 </html>
-
-
