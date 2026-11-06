@@ -1377,3 +1377,22 @@ footer p,footer>a:last-child {
   .footer-block { padding: 20px 18px; }
   .footer-bottom { align-items: flex-start; flex-direction: column; gap: 10px; }
 }
+
+/* Ícones SVG inline: cor herdada do contexto para manter contraste. */
+.icon-svg { display: inline-block; width: 18px; height: 18px; flex: 0 0 auto; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icon-arrow { width: 16px; height: 16px; }
+.icon-camera { width: 17px; height: 17px; margin-left: 2px; }
+.icon-sparkle { width: 34px; height: 34px; fill: currentColor; stroke: none; }
+.ribbon-separator { width: 15px; height: 15px; fill: var(--brown); flex: 0 0 auto; }
+.icon-bread, .icon-cake { width: 30px; height: 30px; color: var(--gold); }
+.icon-bread path:first-child, .icon-cake path:first-child { fill: rgba(249,168,25,.12); }
+.icon-pin { width: 17px; height: 17px; color: var(--gold); }
+.icon-location { width: 19px; height: 19px; color: var(--gold); }
+.icon-clock { width: 16px; height: 16px; color: var(--gold); }
+.icon-sparkle-small { width: 12px; height: 12px; margin-inline: 5px; fill: currentColor; stroke: none; vertical-align: -2px; }
+.summary-stars { display: inline-flex; gap: 2px; color: var(--gold); }
+.summary-stars svg { width: 15px; height: 15px; fill: currentColor; }
+.review-stars { display: inline-flex; gap: 2px; padding: 7px 9px; }
+.review-stars svg { width: 14px; height: 14px; fill: currentColor; }
+.about .highlight-icon { color: var(--gold); }
+.icon-up { width: 15px; height: 15px; margin-left: 5px; }
