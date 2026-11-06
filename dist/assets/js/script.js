@@ -1,4 +1,3 @@
-
 /**
  * Pão de Mestre — Carrossel Infinito Automático
  * Navegação manual, indicadores, swipe e rotação automática.

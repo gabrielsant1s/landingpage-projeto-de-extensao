@@ -1186,3 +1186,11 @@ footer p,footer>a:last-child {
     animation: none;
   }
 }
+
+/* Alinhamento das linhas do catálogo com oito cards. */
+@media (min-width: 641px) {
+  .product-card:nth-child(3n + 1) {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
